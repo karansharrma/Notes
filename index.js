@@ -1,0 +1,32 @@
+const express = require("express");
+const app = express();
+
+const cors = require("cors");
+//const quotes = require("../quotes.json");
+const userRouter = require("./routes/userRoutes");
+const noteRoutes = require("./routes/noteRoutes");
+const port = process.env.PORT || 3000;
+const connectDB = require("./src/db");
+
+app.use(cors());
+connectDB();
+app.use(express.json());
+
+app.use("/users", userRouter);
+app.use("/notes", noteRoutes);
+
+// app.get("/quote", (req, res) => {
+//   res.status(200).json(quotes);
+// });
+
+// app.get("/random", (req, res) => {
+//   let index = Math.floor(Math.random() * quotes.length);
+
+//   let randomquote = quotes[index];
+//   res.status(200).json(randomquote);
+// });
+
+app.listen(5000, () => {
+  console.log("listening on port 5000");
+});
+//https://youtu.be/1XZqls0n_kA?si=3Ss9NOXU0-RzDmDs

@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
-console.log("SECRET_KEY:", SECRET_KEY);
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -77,4 +76,26 @@ const signin = async (req, res) => {
   }
 };
 
-module.exports = { signup, signin };
+const getAllUsers = async (req, res) => {
+  try {
+    // Fetch all users from the database
+    const users = await userModel.find();
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.status(200).json({
+      users: users,
+    });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({
+      message: "Something went wrong while fetching users.",
+      error: err.message || err,
+    });
+  }
+};
+
+module.exports = { signup, signin, getAllUsers };
+

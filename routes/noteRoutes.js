@@ -12,7 +12,7 @@ noteRoutes.get("/", auth, getnote);
 
 noteRoutes.post("/", auth, createnote);
 
-noteRoutes.post("/:noteId", auth, deletenote);
+noteRoutes.delete("/:noteId", auth, deletenote);
 noteRoutes.put("/:noteId", auth, updateenote);
 
 module.exports = noteRoutes;

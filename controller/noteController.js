@@ -18,24 +18,23 @@ const createnote = async (req, res) => {
 };
 
 const updateenote = async (req, res) => {
-  const id = req.params.noteId;
+  const id = req.params.noteId;     // or req.params.id if your router uses :id
   const { title, description } = req.body;
 
-  const updatedNote = {
-    title: title,
-    description: description,
-    userId: req.userId,
-  };
-
   try {
-    await updatedNote.findByIdAndUpdate(
+    const updatedNote = await noteModel.findByIdAndUpdate(
       id,
       { title, description, userId: req.userId },
       { new: true }
     );
+
+    if (!updatedNote) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
     res.status(200).json(updatedNote);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(400).json({ message: "Something went wrong" });
   }
 };
@@ -51,16 +50,21 @@ const getnote = async (req, res) => {
 };
 
 const deletenote = async (req, res) => {
-  const id = req.params.noteId;
-
   try {
-    const note = await noteModel.findByIdAndRemove(id);
+    const noteId = req.params.noteId;
 
-    res.status(200).json({ message: "Note Deleted Successfully!" });
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({ message: "Something went wrong" });
+    const deletedNote = await noteModel.findByIdAndDelete(noteId);
+
+    if (!deletedNote) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    res.json({ message: "Note deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error); 
+    res.status(500).json({ message: "Something went wrong", error: error.message }); 
   }
 };
+
 
 module.exports = { createnote, updateenote, deletenote, getnote };

@@ -6,6 +6,6 @@ const { signup, signin ,getAllUsers} = require("../controller/userController");
 userRouter.post("/signup", signup);
 
 userRouter.post("/signin", signin);
-userRouter.get("/users",getAllUsers)
+userRouter.get("/",getAllUsers)
 
 module.exports = userRouter;

@@ -3,6 +3,8 @@ const userRouter = express.Router();
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload"); 
 const userModel=require("../models/user")
+const cloudinary = require("../cloudinary");
+
 
 const {
 signup, signin, getAllUsers ,deleteUser,updateUser
@@ -16,8 +18,9 @@ userRouter.delete("/delete/:id", auth, deleteUser);
 userRouter.put("/update/:id", auth, updateUser);
 userRouter.get("/profiles", getAllUsers);
 
+
 userRouter.put(
-  "/profile",
+  "/profile-image",
   auth,
   upload.single("image"),
   async (req, res) => {
@@ -25,24 +28,47 @@ userRouter.put(
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
-      req.file.filename
-    }`;
-
     try {
       const userId = req.userId;
 
-      await userModel.findByIdAndUpdate(userId, {
-        profileImageUrl: imageUrl,
+      const base64Image = `data:${
+        req.file.mimetype
+      };base64,${req.file.buffer.toString("base64")}`;
+
+      const uploadResult = await cloudinary.uploader.upload(base64Image, {
+        folder: "user_profiles",
       });
 
-      res
-        .status(200)
-        .json({ imageUrl, message: "Profile image updated successfully" });
+      await userModel.findByIdAndUpdate(userId, {
+        profileImageUrl: uploadResult.secure_url,
+      });
+
+      res.status(200).json({
+        imageUrl: uploadResult.secure_url,
+        message: "Profile image uploaded to Cloudinary successfully",
+      });
     } catch (error) {
-      console.error("Error updating profile image:", error);
-      res.status(500).json({ message: "Failed to update profile image" , error:error.message});
+      console.error("Cloudinary upload error:", error);
+      res.status(500).json({ message: "Failed to upload image" });
     }
   }
 );
+
+userRouter.get("/profile-image", auth, async (req, res) => {
+  try {
+    const user = await userModel.findById(req.userId);
+
+    if (!user || !user.profileImageUrl) {
+      return res.status(404).json({ message: "No profile image found" });
+    }
+
+    res.status(200).json({
+      imageUrl: user.profileImageUrl,
+      message: "Profile image fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching profile image:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 module.exports = userRouter;

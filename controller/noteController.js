@@ -13,12 +13,12 @@ const createnote = async (req, res) => {
     await newNote.save();
     res.status(201).json(newNote);
   } catch (err) {
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: "Something went wrong" ,error:err.message});
   }
 };
 
 const updateenote = async (req, res) => {
-  const id = req.params.noteId;     // or req.params.id if your router uses :id
+  const id = req.params.noteId;    
   const { title, description } = req.body;
 
   try {
@@ -35,7 +35,7 @@ const updateenote = async (req, res) => {
     res.status(200).json(updatedNote);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Something went wrong" });
+    res.status(400).json({ message: "Something went wrong",error:err.message });
   }
 };
 
@@ -45,7 +45,7 @@ const getnote = async (req, res) => {
     res.status(200).json(notes);
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Something went wrong" });
+    res.status(400).json({ message: "Something went wrong",error:err.message });
   }
 };
 

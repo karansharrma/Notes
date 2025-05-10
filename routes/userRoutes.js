@@ -49,7 +49,7 @@ userRouter.put(
       });
     } catch (error) {
       console.error("Cloudinary upload error:", error);
-      res.status(500).json({ message: "Failed to upload image" });
+      res.status(500).json({ message: "Failed to upload image", error:error.message });
     }
   }
 );

@@ -15,6 +15,8 @@ app.use(express.json());
 app.use("/users", userRouter);
 app.use("/notes", noteRoutes);
 
+
+app.use("/uploads", express.static("uploads")); 
 // app.get("/quote", (req, res) => {
 //   res.status(200).json(quotes);
 // });

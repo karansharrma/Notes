@@ -30,26 +30,19 @@ userRouter.put(
 
     try {
       const userId = req.userId;
-
-      const base64Image = `data:${
-        req.file.mimetype
-      };base64,${req.file.buffer.toString("base64")}`;
-
-      const uploadResult = await cloudinary.uploader.upload(base64Image, {
-        folder: "user_profiles",
-      });
+      const imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
 
       await userModel.findByIdAndUpdate(userId, {
-        profileImageUrl: uploadResult.secure_url,
+        profileImageUrl: imageUrl,
       });
 
       res.status(200).json({
-        imageUrl: uploadResult.secure_url,
-        message: "Profile image uploaded to Cloudinary successfully",
+        imageUrl,
+        message: "Profile image uploaded successfully",
       });
     } catch (error) {
-      console.error("Cloudinary upload error:", error);
-      res.status(500).json({ message: "Failed to upload image", error:error.message });
+      console.error("Upload error:", error);
+      res.status(500).json({ message: "Failed to upload image", error: error.message });
     }
   }
 );
@@ -68,7 +61,7 @@ userRouter.get("/profile-image", auth, async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching profile image:", error);
-    res.status(500).json({ message: "Server error" , error:error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 module.exports = userRouter;

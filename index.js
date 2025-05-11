@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
-
+const path = require('path');
 const cors = require("cors");
-//const quotes = require("../quotes.json");
 const userRouter = require("./routes/userRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const port = process.env.PORT || 3000;
 const connectDB = require("./src/db");
+//const quotes = require("../quotes.json");
+
 
 app.use(cors());
 connectDB();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use("/users", userRouter);
 app.use("/notes", noteRoutes);
+app.use("/images", express.static(path.join(__dirname, "uploads")));
 
 
 app.use("/uploads", express.static("uploads")); 
